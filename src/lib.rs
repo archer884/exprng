@@ -1,4 +1,4 @@
-use expr::Realizer;
+pub use expr::Realizer;
 use hashbrown::HashMap;
 use rand::{
     distributions::{DistIter, Uniform},
