@@ -8,5 +8,5 @@ edition = "2018"
 
 [dependencies]
 expr = { path = '..\expr\' }
-hashbrown = "0.10.0"
+hashbrown = "0.9.1"
 rand = "0.8.2"
