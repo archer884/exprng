@@ -5,8 +5,15 @@ use rand::{
     prelude::{Distribution, ThreadRng},
 };
 
+#[derive(Debug, Default)]
 pub struct RandomRealizer {
     source: HashMap<i32, BoundedRng>,
+}
+
+impl RandomRealizer {
+    pub fn new() -> Self {
+        Default::default()
+    }
 }
 
 impl Realizer for RandomRealizer {
@@ -18,6 +25,7 @@ impl Realizer for RandomRealizer {
     }
 }
 
+#[derive(Debug)]
 struct BoundedRng(DistIter<Uniform<i32>, ThreadRng, i32>);
 
 impl BoundedRng {
