@@ -2,37 +2,46 @@ pub use expr::Realizer;
 use hashbrown::HashMap;
 use rand::{
     distributions::{DistIter, Uniform},
-    prelude::{Distribution, ThreadRng},
+    prelude::Distribution,
+    Rng,
 };
 
-#[derive(Debug, Default)]
-pub struct RandomRealizer {
-    source: HashMap<i32, BoundedRng>,
+pub trait InitializeBoundedRng: Rng + Sized {
+    fn initialize(max: i32) -> BoundedRng<Self>;
 }
 
-impl RandomRealizer {
-    pub fn new() -> Self {
-        Default::default()
+impl<R: Default + Rng> InitializeBoundedRng for R {
+    fn initialize(max: i32) -> BoundedRng<Self> {
+        BoundedRng(Uniform::from(1..=max).sample_iter(R::default()))
     }
 }
 
-impl Realizer for RandomRealizer {
+#[derive(Debug, Default)]
+pub struct RandomRealizer<R> {
+    source: HashMap<i32, BoundedRng<R>>,
+}
+
+impl<I: InitializeBoundedRng> RandomRealizer<I> {
+    pub fn new() -> RandomRealizer<I> {
+        RandomRealizer {
+            source: HashMap::new(),
+        }
+    }
+}
+
+impl<I: InitializeBoundedRng> Realizer for RandomRealizer<I> {
     fn next(&mut self, max: i32) -> i32 {
         self.source
             .entry(max)
-            .or_insert_with(|| BoundedRng::new(max))
+            .or_insert_with(|| I::initialize(max))
             .next()
     }
 }
 
 #[derive(Debug)]
-struct BoundedRng(DistIter<Uniform<i32>, ThreadRng, i32>);
+pub struct BoundedRng<R>(DistIter<Uniform<i32>, R, i32>);
 
-impl BoundedRng {
-    fn new(max: i32) -> Self {
-        BoundedRng(Uniform::from(1..=max).sample_iter(rand::thread_rng()))
-    }
-
+impl<R: Rng> BoundedRng<R> {
     fn next(&mut self) -> i32 {
         self.0.next().unwrap()
     }
