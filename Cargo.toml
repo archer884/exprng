@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 expr = { git = 'https://github.com/archer884/expr.git' }
 hashbrown = "0.9.1"
-rand = "0.8.2"
+rand = "0.8.3"
