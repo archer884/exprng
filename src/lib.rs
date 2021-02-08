@@ -5,6 +5,7 @@ use rand::{
     prelude::Distribution,
     Rng,
 };
+use smallvec::SmallVec;
 
 pub trait InitializeBoundedRng: Rng + Sized {
     fn initialize(max: i32) -> BoundedRng<Self>;
@@ -27,6 +28,13 @@ impl<I: InitializeBoundedRng> RandomRealizer<I> {
             source: HashMap::new(),
         }
     }
+
+    pub fn with_logging(&mut self) -> LogWrapper<Self> {
+        LogWrapper {
+            realizer: self,
+            log: HashMap::new(),
+        }
+    }
 }
 
 impl<I: InitializeBoundedRng> Realizer for RandomRealizer<I> {
@@ -35,6 +43,25 @@ impl<I: InitializeBoundedRng> Realizer for RandomRealizer<I> {
             .entry(max)
             .or_insert_with(|| I::initialize(max))
             .next()
+    }
+}
+
+pub struct LogWrapper<'r, R> {
+    realizer: &'r mut R,
+    log: HashMap<i32, SmallVec<[i32; 4]>>,
+}
+
+impl<R> LogWrapper<'_, R> {
+    pub fn finalize(self) -> HashMap<i32, SmallVec<[i32; 4]>> {
+        self.log
+    }
+}
+
+impl<'r, R: Realizer> Realizer for LogWrapper<'r, R> {
+    fn next(&mut self, max: i32) -> i32 {
+        let result = self.realizer.next(max);
+        self.log.entry(max).or_default().push(result);
+        result
     }
 }
 

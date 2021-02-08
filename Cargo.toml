@@ -1,6 +1,6 @@
 [package]
 name = "exprng"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["J/A <archer884@gmail.com>"]
 edition = "2018"
 
@@ -10,3 +10,4 @@ edition = "2018"
 expr = { git = 'https://github.com/archer884/expr.git' }
 hashbrown = "0.9.1"
 rand = "0.8.3"
+smallvec = "1.6.1"
