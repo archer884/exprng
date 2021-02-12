@@ -23,8 +23,8 @@ pub struct RandomRealizer<R> {
 }
 
 impl<I: InitializeBoundedRng> RandomRealizer<I> {
-    pub fn new() -> RandomRealizer<I> {
-        RandomRealizer {
+    pub fn new() -> Self {
+        Self {
             source: HashMap::new(),
         }
     }
